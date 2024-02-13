@@ -1,13 +1,42 @@
 [package]
-name = "zero2prod"
+name = "zero2sixty"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+path = "src/lib.rs"
+
+# Notice the double square brackets: it's an array in TOML's syntax.
+# We can only have one library in a project, but we can have multiple binaries!
+# If you want to manage multiple libraries in the same repository
+# have a look at the workspace feature - we'll cover it later on.
+[[bin]]
+path = "src/main.rs"
+name = "zero2sixty"
 
 [dependencies]
 askama = { version = "0.12.1", features = ["with-axum"] }
 askama_axum = "0.4.0"
 axum = "0.7.4"
 serde = { version = "1.0.195", features = ["derive"] }
-tokio = { version = "1.35.1", features = ["full"] }
+tokio = { version = "1", features = ["full"] }
+config = { version = "0.14", default-features = false, features = ["yaml"] }
+chrono = { version = "0.4.22", default-features = false, features = ["clock"] }
+uuid = { version = "1.7.0", features = ["v4"] }
+
+[dev-dependencies]
+reqwest = { version = "0.11", features = ["json"] }
+
+[dependencies.sqlx]
+version = "0.7"
+default-features = false
+features = [
+"runtime-tokio-rustls",
+"macros",
+"postgres",
+"uuid",
+"chrono",
+"migrate"
+]

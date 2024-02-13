@@ -1,37 +1,19 @@
-use askama_axum::IntoResponse;
-use axum::extract::Path;
-use axum::http::StatusCode;
-use axum::{routing::get, Router};
-use serde::Deserialize;
+use std::error::Error;
+
+use sqlx::PgPool;
+use zero2sixty::configuration::get_configuration;
+use zero2sixty::startup::run;
 #[tokio::main]
-async fn main() {
-    println!("hello");
-    // build our application with a route
-    let app = Router::new()
-        .route("/", get(greet))
-        .route("/:name", get(greet))
-        .route("/health_check", get(_health_check));
-
-    // run it
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:8000")
+async fn main() -> Result<(), Box<dyn Error>> {
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
         .await
-        .unwrap();
-    println!("listening on {}", listener.local_addr().unwrap());
+        .expect("Failed to connect to Postgres.");
+
+    let address = format!("127.0.0.1:{}", configuration.application_port);
+    let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(address).await.unwrap();
+
+    let app = run(connection_pool).await.unwrap();
     axum::serve(listener, app).await.unwrap();
-}
-
-#[derive(Deserialize)]
-struct PathParameter {
-    name: Option<String>,
-}
-
-async fn greet(Path(path_parameter): Path<PathParameter>) -> impl IntoResponse {
-    format!(
-        "hello {:?}",
-        path_parameter.name.unwrap_or("word".to_string())
-    )
-}
-
-async fn _health_check() -> impl IntoResponse {
-    StatusCode::OK
+    Ok(())
 }
