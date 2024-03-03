@@ -11,7 +11,7 @@ pub struct PathParameter {
 // greet endpoint
 pub async fn greet(Path(path_parameter): Path<PathParameter>) -> impl IntoResponse {
     format!(
-        "hello {:?}",
+        "hola {:?}",
         path_parameter.name.unwrap_or("word".to_string())
     )
 }
