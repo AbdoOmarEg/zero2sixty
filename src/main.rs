@@ -1,4 +1,3 @@
-use secrecy::ExposeSecret;
 use sqlx::PgPool;
 use std::error::Error;
 use zero2sixty::configuration::get_configuration;
@@ -11,16 +10,15 @@ async fn main() -> Result<(), Box<dyn Error>> {
     init_subscriber(subscriber);
 
     let configuration = get_configuration().expect("Failed to read configuration.");
-    // expose secret
-    let connection_pool =
-        PgPool::connect(&configuration.database.connection_string().expose_secret())
-            .await
-            .expect("Failed to connect to Postgres.");
+    let connection_pool = PgPool::connect_lazy_with(configuration.database.with_db());
 
-    let address = format!("127.0.0.1:{}", configuration.application_port);
-    let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(address).await.unwrap();
+    let address = format!(
+        "{}:{}",
+        configuration.application.host, configuration.application.port
+    );
+    let listener: tokio::net::TcpListener = tokio::net::TcpListener::bind(address).await?;
 
-    let app = run(connection_pool).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+    let app = run(connection_pool).await?;
+    axum::serve(listener, app).await?;
     Ok(())
 }
