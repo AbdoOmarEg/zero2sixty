@@ -8,3 +8,12 @@ database:
   password: "password"
   database_name: "newsletter"
   require_ssl: false
+email_client:
+  base_url: "localhost"
+  sender_email: "abdelrahmanorigin@gmail.com"
+  # New value!
+  # We are only setting the development value,
+  # we'll deal with the production token outside of version control
+  # (given that it's a sensitive secret!)
+  authorization_token: "f9664b30-4e17-4f95-9271-2d35bd5557b9"
+  timeout_milliseconds: 10000

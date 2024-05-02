@@ -3,7 +3,6 @@ use axum::response::IntoResponse;
 use axum::{http::StatusCode, Form};
 use serde::Deserialize;
 use sqlx::PgPool;
-use unicode_segmentation::UnicodeSegmentation;
 use uuid::Uuid;
 
 // use crate::domain::subscriber_name::{NewSubscriber, SubscriberName};
