@@ -4,3 +4,4 @@
 - [x] chapter 4
 - [x] chapter 5 echo delta charlie over, can't going live, cuz my machine is sensitive from doker compose (syptoms are freezez my system) and I'm too poor for digitalocean
 - [x] chapter 6
+- [x] chapter 7
